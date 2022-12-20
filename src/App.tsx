@@ -1,5 +1,11 @@
+import BabylonExmaple from './components/BabylonExmaple';
+
 function App() {
-    return <div>hello</div>;
+    return (
+        <div>
+            <BabylonExmaple />
+        </div>
+    );
 }
 
 export default App;
