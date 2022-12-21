@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
-import { BasicScene } from '../BabylonExamples/BasicScene';
+import { StandardMaterials } from '../BabylonExamples/StandardMaterials';
 import '../styles/babylonExmaple.css';
 
 export default function BabylonExmaple() {
     useEffect(() => {
         const canvas = document.querySelector('canvas');
-        canvas && new BasicScene(canvas);
+        canvas && new StandardMaterials(canvas);
     }, []);
 
     return (

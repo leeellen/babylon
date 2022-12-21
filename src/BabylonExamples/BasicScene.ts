@@ -14,7 +14,7 @@ export class BasicScene {
     }
     CreateScene(): Scene {
         const scene = new Scene(this.engine);
-        const camera = new FreeCamera('camera', new Vector3(0, 1, 0), this.scene);
+        const camera = new FreeCamera('camera', new Vector3(0, 1, -5), this.scene);
         camera.attachControl();
 
         const hemiLight = new HemisphericLight('hemiLight', new Vector3(0, 1, 0), this.scene);
