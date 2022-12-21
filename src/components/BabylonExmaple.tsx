@@ -1,16 +1,15 @@
 import React, { useEffect } from 'react';
-import { StandardMaterials } from '../BabylonExamples/StandardMaterials';
+import { PBR } from '../BabylonExamples/PBR';
 import '../styles/babylonExmaple.css';
 
 export default function BabylonExmaple() {
     useEffect(() => {
         const canvas = document.querySelector('canvas');
-        canvas && new StandardMaterials(canvas);
+        canvas && new PBR(canvas);
     }, []);
 
     return (
         <div>
-            <h3>Babylon Examples</h3>
             <canvas />
         </div>
     );

@@ -1,5 +1,10 @@
-import { Scene, Engine, FreeCamera, Vector3, HemisphericLight, MeshBuilder } from '@babylonjs/core';
+/**
+ * Babylon 101 Part1
+ * https://www.youtube.com/watch?v=NLZuUtiL50A&list=PLym1B0rdkvqhuCNSXzxw6ofEkrpYI70P4
+ *
+ */
 
+import { Scene, Engine, FreeCamera, Vector3, HemisphericLight, MeshBuilder } from '@babylonjs/core';
 export class BasicScene {
     scene: Scene;
     engine: Engine;
