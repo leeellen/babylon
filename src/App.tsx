@@ -2,6 +2,7 @@ import Basic from './components/Basic';
 import StandardMaterials from './components/StandardMaterials';
 import PBR from './components/PBR';
 import CustomModels from './components/CustomModels';
+import LightShadow from './components/LightShadow';
 
 function App() {
     return (
@@ -9,7 +10,8 @@ function App() {
             {/* <Basic /> */}
             {/* <StandardMaterials /> */}
             {/* <PBR /> */}
-            <CustomModels />
+            {/* <CustomModels /> */}
+            <LightShadow />
         </div>
     );
 }
