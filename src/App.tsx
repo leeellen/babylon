@@ -3,6 +3,7 @@ import StandardMaterials from './components/StandardMaterials';
 import PBR from './components/PBR';
 import CustomModels from './components/CustomModels';
 import LightShadow from './components/LightShadow';
+import BakedLighting from './components/BakedLighting';
 
 function App() {
     return (
@@ -11,7 +12,8 @@ function App() {
             {/* <StandardMaterials /> */}
             {/* <PBR /> */}
             {/* <CustomModels /> */}
-            <LightShadow />
+            {/* <LightShadow /> */}
+            <BakedLighting />
         </div>
     );
 }
