@@ -1,11 +1,15 @@
-import BabylonExmaple from './components/BabylonExmaple';
-import Box from './components/Box';
+import Basic from './components/Basic';
+import StandardMaterials from './components/StandardMaterials';
+import PBR from './components/PBR';
+import CustomModels from './components/CustomModels';
 
 function App() {
     return (
         <div>
-            {/* <BabylonExmaple /> */}
-            <Box />
+            {/* <Basic /> */}
+            {/* <StandardMaterials /> */}
+            {/* <PBR /> */}
+            <CustomModels />
         </div>
     );
 }
