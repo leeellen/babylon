@@ -4,18 +4,10 @@ import PBR from './components/PBR';
 import CustomModels from './components/CustomModels';
 import LightShadow from './components/LightShadow';
 import BakedLighting from './components/BakedLighting';
+import CustomLoading from './components/CustomLoading';
 
 function App() {
-    return (
-        <div>
-            {/* <Basic /> */}
-            {/* <StandardMaterials /> */}
-            {/* <PBR /> */}
-            {/* <CustomModels /> */}
-            {/* <LightShadow /> */}
-            <BakedLighting />
-        </div>
-    );
+    return <CustomLoading />;
 }
 
 export default App;

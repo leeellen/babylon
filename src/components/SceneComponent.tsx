@@ -1,14 +1,17 @@
 import React, { useEffect, useRef } from 'react';
 import { Engine, EngineOptions, Scene, SceneOptions } from '@babylonjs/core';
 import '../styles/babylonExmaple.css';
+import { CustomLoadingScreen } from './CustomLoadingScreen';
+import { Player } from '@lottiefiles/react-lottie-player';
+import loading from '../assets/loading.gif';
 
 type SceneComponentType = {
     antialias?: boolean;
     engineOptions?: EngineOptions;
     adaptToDeviceRatio?: boolean;
     sceneOptions?: SceneOptions;
-    onRender: (scene: Scene) => void;
-    onSceneReady: (scene: Scene) => void;
+    onRender: (scene: Scene, engine: Engine) => void;
+    onSceneReady: (scene: Scene, engine: Engine, loadingScreen: CustomLoadingScreen) => void;
 };
 export default function SceneComponent({
     antialias,
@@ -24,20 +27,42 @@ export default function SceneComponent({
     // set up basic engine and scene
     useEffect(() => {
         const { current: canvas } = reactCanvas;
-
-        if (!canvas) return;
-
         const engine = new Engine(canvas, antialias, engineOptions, adaptToDeviceRatio);
+
+        const loadingScreenDiv = document.getElementById('loadingScreen') as HTMLElement;
+
+        function customLoadingScreen() {
+            console.log('customLoadingScreen creation');
+        }
+        customLoadingScreen.prototype.displayLoadingUI = function () {
+            console.log('customLoadingScreen loading');
+            loadingScreenDiv.style.background = 'rgb(255, 255, 255,0.6)';
+        };
+        customLoadingScreen.prototype.hideLoadingUI = function () {
+            console.log('customLoadingScreen loaded');
+            loadingScreenDiv.style.background = 'rgb(255, 255, 255,0)';
+
+            setTimeout(() => {
+                loadingScreenDiv.style.display = 'none';
+            }, 0);
+        };
+
+        // @ts-ignore
+        const loadingScreen = new customLoadingScreen();
+        engine.loadingScreen = loadingScreen;
+
+        engine.displayLoadingUI();
+
         const scene = new Scene(engine, sceneOptions);
 
         if (scene.isReady()) {
-            onSceneReady(scene);
+            onSceneReady(scene, engine, loadingScreen);
         } else {
-            scene.onReadyObservable.addOnce((scene) => onSceneReady(scene));
+            scene.onReadyObservable.addOnce((scene) => onSceneReady(scene, engine, loadingScreen));
         }
 
         engine.runRenderLoop(() => {
-            if (typeof onRender === 'function') onRender(scene);
+            if (typeof onRender === 'function') onRender(scene, engine);
             scene.render();
         });
 
@@ -58,5 +83,32 @@ export default function SceneComponent({
         };
     }, [antialias, engineOptions, adaptToDeviceRatio, sceneOptions, onRender, onSceneReady]);
 
-    return <canvas ref={reactCanvas} {...rest} />;
+    return (
+        <>
+            <div
+                id="loadingScreen"
+                style={{
+                    width: '100%',
+                    height: '100%',
+                    position: 'absolute',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'background 0.5s ease-out',
+                }}
+            >
+                <img src={loading} alt="loading" />
+                {/* <Player
+                    background="transparent"
+                    speed={1}
+                    src="https://assets5.lottiefiles.com/private_files/lf30_ployuqvp.json"
+                    autoplay
+                    loop
+                    controls={false}
+                    style={{ height: '300px', width: '300px' }}
+                /> */}
+            </div>
+            <canvas ref={reactCanvas} {...rest} />;
+        </>
+    );
 }
