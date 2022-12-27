@@ -1,11 +1,9 @@
 import {
     FreeCamera,
     Vector3,
-    HemisphericLight,
     MeshBuilder,
     Scene,
     CubeTexture,
-    Sound,
     Texture,
     PBRMaterial,
     SceneLoader,

@@ -1,16 +1,13 @@
 import { FreeCamera, Vector3, Scene, SceneLoader, CubeTexture, Engine } from '@babylonjs/core';
 import '@babylonjs/loaders';
-import { CustomLoadingScreen } from './CustomLoadingScreen';
 import SceneComponent from './SceneComponent';
 
 let currentScene: Scene;
 let currentEngine: Engine;
-let currentLoading: CustomLoadingScreen;
 
-const onSceneReady = (scene: Scene, engine: Engine, loadingScreen: CustomLoadingScreen) => {
+const onSceneReady = (scene: Scene, engine: Engine) => {
     currentScene = scene;
     currentEngine = engine;
-    currentLoading = loadingScreen;
 
     createCamera();
     createSkyBox();

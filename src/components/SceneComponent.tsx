@@ -1,8 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Engine, EngineOptions, Scene, SceneOptions } from '@babylonjs/core';
 import '../styles/babylonExmaple.css';
-import { CustomLoadingScreen } from './CustomLoadingScreen';
-import { Player } from '@lottiefiles/react-lottie-player';
 import loading from '../assets/loading.gif';
 
 type SceneComponentType = {
@@ -11,7 +9,7 @@ type SceneComponentType = {
     adaptToDeviceRatio?: boolean;
     sceneOptions?: SceneOptions;
     onRender: (scene: Scene, engine: Engine) => void;
-    onSceneReady: (scene: Scene, engine: Engine, loadingScreen: CustomLoadingScreen) => void;
+    onSceneReady: (scene: Scene, engine: Engine, canvas?: HTMLCanvasElement) => void;
 };
 export default function SceneComponent({
     antialias,
@@ -27,6 +25,8 @@ export default function SceneComponent({
     // set up basic engine and scene
     useEffect(() => {
         const { current: canvas } = reactCanvas;
+        if (!canvas) return;
+
         const engine = new Engine(canvas, antialias, engineOptions, adaptToDeviceRatio);
 
         const loadingScreenDiv = document.getElementById('loadingScreen') as HTMLElement;
@@ -56,9 +56,9 @@ export default function SceneComponent({
         const scene = new Scene(engine, sceneOptions);
 
         if (scene.isReady()) {
-            onSceneReady(scene, engine, loadingScreen);
+            onSceneReady(scene, engine, canvas);
         } else {
-            scene.onReadyObservable.addOnce((scene) => onSceneReady(scene, engine, loadingScreen));
+            scene.onReadyObservable.addOnce((scene) => onSceneReady(scene, engine, canvas));
         }
 
         engine.runRenderLoop(() => {
@@ -84,7 +84,8 @@ export default function SceneComponent({
     }, [antialias, engineOptions, adaptToDeviceRatio, sceneOptions, onRender, onSceneReady]);
 
     return (
-        <>
+        <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+            <canvas ref={reactCanvas} {...rest} />
             <div
                 id="loadingScreen"
                 style={{
@@ -95,20 +96,11 @@ export default function SceneComponent({
                     alignItems: 'center',
                     justifyContent: 'center',
                     transition: 'background 0.5s ease-out',
+                    top: 0,
                 }}
             >
                 <img src={loading} alt="loading" />
-                {/* <Player
-                    background="transparent"
-                    speed={1}
-                    src="https://assets5.lottiefiles.com/private_files/lf30_ployuqvp.json"
-                    autoplay
-                    loop
-                    controls={false}
-                    style={{ height: '300px', width: '300px' }}
-                /> */}
             </div>
-            <canvas ref={reactCanvas} {...rest} />;
-        </>
+        </div>
     );
 }
