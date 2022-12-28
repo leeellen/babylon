@@ -53,6 +53,8 @@ export default function SceneComponent({
 
         engine.displayLoadingUI();
 
+        engine.displayLoadingUI();
+
         const scene = new Scene(engine, sceneOptions);
 
         if (scene.isReady()) {

@@ -1,4 +1,15 @@
-import { FreeCamera, Vector3, Scene, SceneLoader, CubeTexture, Engine, ArcRotateCamera, Camera } from '@babylonjs/core';
+import {
+    FreeCamera,
+    Vector3,
+    Scene,
+    SceneLoader,
+    CubeTexture,
+    Engine,
+    ArcRotateCamera,
+    Camera,
+    GlowLayer,
+    AbstractMesh,
+} from '@babylonjs/core';
 import '@babylonjs/loaders';
 import SceneComponent from './SceneComponent';
 import '../styles/cameraMechanics.css';
@@ -7,44 +18,47 @@ let currentCanvas: HTMLCanvasElement | undefined;
 let currentScene: Scene;
 let currentEngine: Engine;
 let currentCamera: ArcRotateCamera;
-let watch;
+let watch: AbstractMesh;
 
 const onSceneReady = (scene: Scene, engine: Engine, canvas?: HTMLCanvasElement) => {
     currentCanvas = canvas;
     currentScene = scene;
     currentEngine = engine;
 
-    createCamera();
     createSkyBox();
+    createCamera();
     createWatch();
 };
 
 const createCamera = () => {
-    // 오브젝트 중심으로 카메라 이동
     currentCamera = new ArcRotateCamera('camera', -Math.PI / 2, Math.PI / 2, 40, Vector3.Zero(), currentScene);
 
     currentCamera.attachControl(currentCanvas, true);
     currentCamera.wheelPrecision = 100; // 휠을 이용한 줌 속도
 
-    currentCamera.minZ = 0.3;
+    currentCamera.minZ = 0.1;
 
     currentCamera.lowerRadiusLimit = 1;
-    currentCamera.upperRadiusLimit = 5;
+    currentCamera.upperRadiusLimit = 2;
+
     currentCamera.panningSensibility = 0;
-    // currentCamera.useBouncingBehavior = true;
+
+    // currentCamera.useBouncingBehavior = true; // 너무 가까워질때 바운싱 효과와 함께 전환
+
     currentCamera.useAutoRotationBehavior = true; // 상호작용이 없는 경우 자동 카메라 회전
-    currentCamera.autoRotationBehavior!.idleRotationSpeed = 0.3; // 회전 속도
+    currentCamera.autoRotationBehavior!.idleRotationSpeed = 0.1; // 회전 속도
     currentCamera.autoRotationBehavior!.idleRotationSpinupTime = 1000; // 상호작용 후 다시 회전하기까지 대기시간
     currentCamera.autoRotationBehavior!.idleRotationWaitTime = 2000; // 최대 공회전 속도까지 회전하는 데 걸리는 시간(밀리초)
     currentCamera.autoRotationBehavior!.zoomStopsAnimation = true; // 줌하면 회전 정지 여부
 
     currentCamera.useFramingBehavior = true; // 카메라 자동 배치 => 자연스러운 배치
-    currentCamera.framingBehavior!.radiusScale = 2; // 반지름
+    currentCamera.framingBehavior!.radiusScale = 1; // 반지름
     // currentCamera.framingBehavior!.framingTime = 4000; // 전환시간
 };
 
 const createSkyBox = () => {
     const envTex = CubeTexture.CreateFromPrefilteredData('environment/christmas.env', currentScene);
+
     envTex.gammaSpace = false;
 
     envTex.rotationY = Math.PI;
@@ -55,13 +69,10 @@ const createSkyBox = () => {
 };
 
 const createWatch = async () => {
-    const { meshes } = await SceneLoader.ImportMeshAsync('', './models/', 'vintage.glb', currentScene);
+    const { meshes } = await SceneLoader.ImportMeshAsync('', './models/', 'vintage.glb');
 
-    console.log('meshes', meshes);
-
-    watch = meshes[0];
     currentCamera.setTarget(meshes[2]);
-    currentEngine.loadingScreen.hideLoadingUI();
+    currentEngine.loadingScreen.hideLoadingUI(); // 로딩화면 제거
 };
 
 const onRender = () => {
