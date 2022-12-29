@@ -16,7 +16,7 @@ const onSceneReady = (scene: Scene) => {
     camera.attachControl();
     camera.speed = 0.25;
 
-    const envTex = CubeTexture.CreateFromPrefilteredData('environment/roof.env', scene);
+    const envTex = CubeTexture.CreateFromPrefilteredData('assets/environment/roof.env', scene);
 
     scene.environmentTexture = envTex;
     scene.createDefaultSkybox(envTex, true);

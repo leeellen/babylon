@@ -6,9 +6,10 @@ import LightShadow from './components/LightShadow';
 import BakedLighting from './components/BakedLighting';
 import CustomLoading from './components/CustomLoading';
 import CameraMechanics from './components/CameraMechanics';
+import './styles/index.css';
 
 function App() {
-    return <CameraMechanics />;
+    return <Basic />;
 }
 
 export default App;
