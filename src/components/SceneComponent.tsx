@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import { Engine, EngineOptions, Scene, SceneOptions } from '@babylonjs/core';
-import loading from '../assets/loading.gif';
 
 type SceneComponentType = {
     antialias?: boolean;
@@ -21,36 +20,41 @@ export default function SceneComponent({
 }: SceneComponentType) {
     const reactCanvas = useRef(null);
 
-    // set up basic engine and scene
     useEffect(() => {
         const { current: canvas } = reactCanvas;
         if (!canvas) return;
 
         const engine = new Engine(canvas, antialias, engineOptions, adaptToDeviceRatio);
 
-        // const loadingScreenDiv = document.getElementById('loadingScreen') as HTMLElement;
+        // 클래스를 작성하여 구현하는 방법도 있지만 해당 코드에서는 인라인 코드로 작성하였다.
+        const loadingScreenDiv = document.getElementById('loadingScreen') as HTMLElement;
 
-        // function customLoadingScreen() {
-        //     console.log('customLoadingScreen creation');
-        // }
-        // customLoadingScreen.prototype.displayLoadingUI = function () {
-        //     console.log('customLoadingScreen loading');
-        //     loadingScreenDiv.style.background = 'rgb(255, 255, 255,0.6)';
-        // };
-        // customLoadingScreen.prototype.hideLoadingUI = function () {
-        //     console.log('customLoadingScreen loaded');
-        //     loadingScreenDiv.style.background = 'rgb(255, 255, 255,0)';
+        // 로딩 생성자 함수
+        function customLoadingScreen() {
+            console.log('customLoadingScreen creation');
+        }
 
-        //     setTimeout(() => {
-        //         loadingScreenDiv.style.display = 'none';
-        //     }, 0);
-        // };
+        // 로딩 보이기
+        customLoadingScreen.prototype.displayLoadingUI = function () {
+            console.log('customLoadingScreen loading');
+            loadingScreenDiv.style.background = 'rgb(255, 255, 255,0.6)';
+        };
 
-        // // @ts-ignore
-        // const loadingScreen = new customLoadingScreen();
-        // engine.loadingScreen = loadingScreen;
+        // 로딩 숨기기
+        customLoadingScreen.prototype.hideLoadingUI = function () {
+            console.log('customLoadingScreen loaded');
+            loadingScreenDiv.style.background = 'rgb(255, 255, 255,0)';
 
-        // engine.displayLoadingUI();
+            setTimeout(() => {
+                loadingScreenDiv.style.display = 'none';
+            }, 0);
+        };
+
+        // @ts-ignore
+        const loadingScreen = new customLoadingScreen(); // 로딩 생성자 함수를 이용하여 커스텀 로딩 스크린 인터페이스 생성
+        engine.loadingScreen = loadingScreen; // 엔진의 로딩스크린 값을 커스텀로딩스크린으로 초기화
+
+        engine.displayLoadingUI(); // 로딩 스크린 보이도록
 
         const scene = new Scene(engine, sceneOptions);
 
@@ -85,7 +89,7 @@ export default function SceneComponent({
     return (
         <div style={{ width: '100%', height: '100%', position: 'relative' }}>
             <canvas ref={reactCanvas} {...rest} />
-            {/* <div
+            <div
                 id="loadingScreen"
                 style={{
                     width: '100%',
@@ -98,8 +102,8 @@ export default function SceneComponent({
                     top: 0,
                 }}
             >
-                <img src={loading} alt="loading" />
-            </div> */}
+                <img src="assets/loading.gif" alt="loading" />
+            </div>
         </div>
     );
 }
