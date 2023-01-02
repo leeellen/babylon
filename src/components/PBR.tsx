@@ -5,85 +5,73 @@ import {
     MeshBuilder,
     Scene,
     CubeTexture,
-    Sound,
     Texture,
     PBRMaterial,
+    Color3,
+    GlowLayer,
 } from '@babylonjs/core';
 import SceneComponent from './SceneComponent';
 
+let currentScene: Scene;
+
 const onSceneReady = (scene: Scene) => {
-    const camera = new FreeCamera('camera', new Vector3(0, 1, -5), scene);
+    currentScene = scene;
+
+    const camera = new FreeCamera('camera', new Vector3(0, 1, -5), currentScene);
     camera.attachControl();
     camera.speed = 0.25;
 
-    const hemiLight = new HemisphericLight('hemiLight', new Vector3(0, 1, 0), scene);
-
+    const hemiLight = new HemisphericLight('hemiLight', new Vector3(0, 1, 0), currentScene);
     hemiLight.intensity = 1;
 
-    const envTex = CubeTexture.CreateFromPrefilteredData('environment/sky.env', scene);
+    const envTex = CubeTexture.CreateFromPrefilteredData('assets/environment/sky.env', currentScene);
+    currentScene.environmentTexture = envTex;
+    currentScene.createDefaultSkybox(envTex, true);
 
-    scene.environmentTexture = envTex;
-    scene.createDefaultSkybox(envTex, true);
-
-    createEnvironment(scene);
-    sound(scene);
+    createEnvironment();
 };
 
-const createEnvironment = (scene: Scene) => {
-    const ground = MeshBuilder.CreateGround('ground', { width: 10, height: 10 }, scene);
+const createEnvironment = () => {
+    const ground = MeshBuilder.CreateGround('ground', { width: 10, height: 10 }, currentScene);
+    ground.material = createAsphalt();
 
-    const ball = MeshBuilder.CreateSphere('ball', { diameter: 1 }, scene);
-
+    const ball = MeshBuilder.CreateSphere('ball', { diameter: 1 }, currentScene);
     ball.position = new Vector3(0, 1, 0);
-
-    ground.material = createAsphalt(scene);
-    ball.material = CreateBallTexture(scene);
+    ball.material = CreateBallTexture();
 };
 
-const sound = (scene: Scene) => {
-    return new Sound('music', 'sound/music.mp3', scene, null, { loop: true, autoplay: true });
-};
+const createAsphalt = () => {
+    const pbr = new PBRMaterial('asphalt', currentScene);
 
-const createAsphalt = (scene: Scene) => {
-    const pbr = new PBRMaterial('asphalt', scene);
-
-    pbr.albedoTexture = new Texture('textures/asphalt/asphalt_diff.jpg', scene);
-
-    pbr.bumpTexture = new Texture('textures/asphalt/asphalt_nor.jpg', scene);
-
+    pbr.albedoTexture = new Texture('assets/textures/asphalt/asphalt_diff.jpg', currentScene);
+    pbr.bumpTexture = new Texture('assets/textures/asphalt/asphalt_nor.jpg', currentScene);
     pbr.invertNormalMapX = true;
     pbr.invertNormalMapY = true;
-
     pbr.useAmbientOcclusionFromMetallicTextureRed = true;
     pbr.useRoughnessFromMetallicTextureGreen = true;
     pbr.useMetallnessFromMetallicTextureBlue = true;
-
-    pbr.metallicTexture = new Texture('./textures/asphalt/asphalt_ao_rough_metal.jpg', scene);
+    pbr.metallicTexture = new Texture('assets/textures/asphalt/asphalt_ao_rough_metal.jpg', currentScene);
 
     return pbr;
 };
 
-const CreateBallTexture = (scene: Scene) => {
-    const pbr = new PBRMaterial('magic', scene);
+const CreateBallTexture = () => {
+    const pbr = new PBRMaterial('denim', currentScene);
 
-    pbr.albedoTexture = new Texture('textures/magic/magic_diff.jpg', scene);
-
-    pbr.bumpTexture = new Texture('textures/magic/magic_nor.jpg', scene);
-
+    pbr.albedoTexture = new Texture('assets/textures/denim/denim_diff.jpeg', currentScene);
+    pbr.bumpTexture = new Texture('assets/textures/denim/denim_nor.jpeg', currentScene);
     pbr.invertNormalMapX = true;
     pbr.invertNormalMapY = true;
-
     pbr.useAmbientOcclusionFromMetallicTextureRed = true;
     pbr.useRoughnessFromMetallicTextureGreen = true;
     pbr.useMetallnessFromMetallicTextureBlue = true;
-
-    pbr.metallicTexture = new Texture('textures/magic/magic_ao_rough_metal.jpg', scene);
+    pbr.metallicTexture = new Texture('assets/textures/denim/denim_ao_rough_metal.jpeg', currentScene);
 
     // pbr.emissiveColor = new Color3(1, 1, 1);
-    // pbr.emissiveTexture = new Texture('./textures/magic/magic_ao_rough_metal.jpg', scene);
+    // pbr.emissiveTexture = new Texture('assets/textures/denim/denim_ao_rough_metal.jpeg', currentScene);
     // pbr.emissiveIntensity = 3;
 
-    // const glowLayer = new GlowLayer('glow', scene);
+    // const glowLayer = new GlowLayer('glow', currentScene);
     // glowLayer.intensity = 1;
 
     return pbr;
@@ -93,11 +81,6 @@ const onRender = (scene: Scene) => {
     /**
      * Will run on every frame render.  We are spinning the box on y-axis.
      */
-    // if (box !== undefined) {
-    //     const deltaTimeInMillis = scene.getEngine().getDeltaTime();
-    //     const rpm = 20;
-    //     box.rotation.x += (rpm / 60) * Math.PI * 2 * (deltaTimeInMillis / 1000);
-    // }
 };
 
 export default function PBR() {
