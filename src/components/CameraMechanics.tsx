@@ -12,7 +12,6 @@ import {
 } from '@babylonjs/core';
 import '@babylonjs/loaders';
 import SceneComponent from './SceneComponent';
-import '../styles/cameraMechanics.css';
 
 let currentCanvas: HTMLCanvasElement | undefined;
 let currentScene: Scene;
@@ -57,7 +56,7 @@ const createCamera = () => {
 };
 
 const createSkyBox = () => {
-    const envTex = CubeTexture.CreateFromPrefilteredData('environment/christmas.env', currentScene);
+    const envTex = CubeTexture.CreateFromPrefilteredData('assets/environment/christmas.env', currentScene);
 
     envTex.gammaSpace = false;
 
@@ -69,7 +68,7 @@ const createSkyBox = () => {
 };
 
 const createWatch = async () => {
-    const { meshes } = await SceneLoader.ImportMeshAsync('', './models/', 'vintage.glb');
+    const { meshes } = await SceneLoader.ImportMeshAsync('', 'assets/models/', 'vintage.glb');
 
     currentCamera.setTarget(meshes[2]);
     currentEngine.loadingScreen.hideLoadingUI(); // 로딩화면 제거
