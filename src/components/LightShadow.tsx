@@ -87,7 +87,9 @@ const createLight = () => {
     );
     spotLight.intensity = 100; // 밝기
 
+    // 그림자 유무
     spotLight.shadowEnabled = true;
+    // 그림자 설정
     spotLight.shadowMinZ = 1;
     spotLight.shadowMaxZ = 10;
 
