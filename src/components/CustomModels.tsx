@@ -57,7 +57,7 @@ const createBarrel = async (scene: Scene) => {
 };
 
 const createCamp = async (scene: Scene) => {
-    const models = await SceneLoader.ImportMeshAsync('', 'models/', 'camp.glb', scene);
+    const models = await SceneLoader.ImportMeshAsync('', 'assets/models/', 'camp.glb', scene);
     models.meshes[0].position = new Vector3(-3, 0, 0);
 };
 
