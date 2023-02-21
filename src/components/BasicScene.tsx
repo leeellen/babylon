@@ -20,6 +20,6 @@ const onRender = (scene: Scene) => {
      */
 };
 
-export default function Basic() {
+export default function BasicScene() {
     return <SceneComponent antialias onSceneReady={onSceneReady} onRender={onRender} />;
 }

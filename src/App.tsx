@@ -1,8 +1,8 @@
 import './styles/index.css';
-import Basic from './components/Basic';
+import BasicScene from './components/BasicScene';
 
 function App() {
-    return <Basic />;
+    return <BasicScene />;
 }
 
 export default App;
