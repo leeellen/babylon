@@ -28,30 +28,6 @@ export default function SceneComponent({
 
         const engine = new Engine(canvas, antialias, engineOptions, adaptToDeviceRatio);
 
-        // const loadingScreenDiv = document.getElementById('loadingScreen') as HTMLElement;
-
-        // function customLoadingScreen() {
-        //     console.log('customLoadingScreen creation');
-        // }
-        // customLoadingScreen.prototype.displayLoadingUI = function () {
-        //     console.log('customLoadingScreen loading');
-        //     loadingScreenDiv.style.background = 'rgb(255, 255, 255,0.6)';
-        // };
-        // customLoadingScreen.prototype.hideLoadingUI = function () {
-        //     console.log('customLoadingScreen loaded');
-        //     loadingScreenDiv.style.background = 'rgb(255, 255, 255,0)';
-
-        //     setTimeout(() => {
-        //         loadingScreenDiv.style.display = 'none';
-        //     }, 0);
-        // };
-
-        // // @ts-ignore
-        // const loadingScreen = new customLoadingScreen();
-        // engine.loadingScreen = loadingScreen;
-
-        // engine.displayLoadingUI();
-
         const scene = new Scene(engine, sceneOptions);
 
         if (scene.isReady()) {
@@ -82,24 +58,5 @@ export default function SceneComponent({
         };
     }, [antialias, engineOptions, adaptToDeviceRatio, sceneOptions, onRender, onSceneReady]);
 
-    return (
-        <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-            <canvas ref={reactCanvas} {...rest} />
-            {/* <div
-                id="loadingScreen"
-                style={{
-                    width: '100%',
-                    height: '100%',
-                    position: 'absolute',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'background 0.5s ease-out',
-                    top: 0,
-                }}
-            >
-                <img src={loading} alt="loading" />
-            </div> */}
-        </div>
-    );
+    return <canvas ref={reactCanvas} {...rest} />;
 }

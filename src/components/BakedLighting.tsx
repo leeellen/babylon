@@ -15,7 +15,7 @@ const createCamera = (scene: Scene) => {
 };
 
 const createEnvironment = async (scene: Scene) => {
-    const { meshes } = await SceneLoader.ImportMeshAsync('', 'assets/models/', 'bust_demo.glb', scene);
+    await SceneLoader.ImportMeshAsync('', 'assets/models/', 'bust_demo.glb', scene);
 };
 
 const onRender = (scene: Scene) => {
