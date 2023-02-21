@@ -2,6 +2,10 @@ import { FreeCamera, Vector3, Scene, CubeTexture, SceneLoader } from '@babylonjs
 import '@babylonjs/loaders';
 import SceneComponent from './SceneComponent';
 
+const sky = require('../assets/environment/sky.env');
+const barrel = require('../assets/models/barrel.glb');
+const camp = require('../assets/models/camp.glb');
+
 let currentScene: Scene;
 
 const onSceneReady = (scene: Scene) => {
@@ -11,7 +15,7 @@ const onSceneReady = (scene: Scene) => {
     camera.attachControl();
     camera.speed = 0.25;
 
-    const envTex = CubeTexture.CreateFromPrefilteredData('assets/environment/sky.env', currentScene);
+    const envTex = CubeTexture.CreateFromPrefilteredData(sky, currentScene);
     currentScene.environmentTexture = envTex;
     currentScene.createDefaultSkybox(envTex, true);
     currentScene.environmentIntensity = 0.5;
@@ -21,11 +25,11 @@ const onSceneReady = (scene: Scene) => {
 };
 
 const createBarrel = async () => {
-    await SceneLoader.ImportMeshAsync('', 'assets/models/', 'barrel.glb', currentScene);
+    await SceneLoader.ImportMeshAsync('', barrel, '', currentScene);
 };
 
 const createCamp = async () => {
-    await SceneLoader.ImportMeshAsync('', 'assets/models/', 'camp.glb', currentScene);
+    await SceneLoader.ImportMeshAsync('', camp, '', currentScene);
 };
 
 const onRender = () => {
