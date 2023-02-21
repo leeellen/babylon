@@ -1,6 +1,8 @@
 import { FreeCamera, Vector3, HemisphericLight, MeshBuilder, Scene, SceneLoader } from '@babylonjs/core';
 import SceneComponent from './SceneComponent';
 
+const prototype_Level = require('../assets/models/prototype_Level.glb');
+
 let camera;
 let currentScene: Scene;
 
@@ -15,7 +17,7 @@ const onSceneReady = (scene: Scene) => {
 };
 
 const createEnvironment = async () => {
-    const { meshes } = await SceneLoader.ImportMeshAsync('', 'assets/models/', 'Prototype_Level.glb', currentScene);
+    const { meshes } = await SceneLoader.ImportMeshAsync('', prototype_Level, '', currentScene);
 };
 
 const onRender = (scene: Scene) => {

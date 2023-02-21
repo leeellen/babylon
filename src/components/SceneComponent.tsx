@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import { Engine, EngineOptions, Scene, SceneOptions } from '@babylonjs/core';
-import loading from '../assets/loading.gif';
 
 type SceneComponentType = {
     antialias?: boolean;
@@ -8,7 +7,7 @@ type SceneComponentType = {
     adaptToDeviceRatio?: boolean;
     sceneOptions?: SceneOptions;
     onRender: (scene: Scene, engine: Engine) => void;
-    onSceneReady: (scene: Scene, engine: Engine, canvas?: HTMLCanvasElement) => void;
+    onSceneReady: (scene: Scene, engine: Engine) => void;
 };
 export default function SceneComponent({
     antialias,
@@ -21,7 +20,6 @@ export default function SceneComponent({
 }: SceneComponentType) {
     const reactCanvas = useRef(null);
 
-    // set up basic engine and scene
     useEffect(() => {
         const { current: canvas } = reactCanvas;
         if (!canvas) return;
@@ -30,9 +28,9 @@ export default function SceneComponent({
         const scene = new Scene(engine, sceneOptions);
 
         if (scene.isReady()) {
-            onSceneReady(scene, engine, canvas);
+            onSceneReady(scene, engine);
         } else {
-            scene.onReadyObservable.addOnce((scene) => onSceneReady(scene, engine, canvas));
+            scene.onReadyObservable.addOnce((scene) => onSceneReady(scene, engine));
         }
 
         engine.runRenderLoop(() => {
