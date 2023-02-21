@@ -58,8 +58,6 @@ const createMeshes = async () => {
     cylinder.rotation = new Vector3(-Math.PI / 4, 0, 0);
 
     createActions();
-
-    currentEngine.hideLoadingUI();
 };
 
 const createActions = async () => {
