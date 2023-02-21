@@ -47,9 +47,9 @@ const sound = (scene: Scene) => {
 const createAsphalt = (scene: Scene) => {
     const pbr = new PBRMaterial('asphalt', scene);
 
-    pbr.albedoTexture = new Texture('textures/asphalt/asphalt_diff.jpg', scene);
+    pbr.albedoTexture = new Texture('assets/textures/asphalt/asphalt_diff.jpg', scene);
 
-    pbr.bumpTexture = new Texture('textures/asphalt/asphalt_nor.jpg', scene);
+    pbr.bumpTexture = new Texture('assets/textures/asphalt/asphalt_nor.jpg', scene);
 
     pbr.invertNormalMapX = true;
     pbr.invertNormalMapY = true;
@@ -58,7 +58,7 @@ const createAsphalt = (scene: Scene) => {
     pbr.useRoughnessFromMetallicTextureGreen = true;
     pbr.useMetallnessFromMetallicTextureBlue = true;
 
-    pbr.metallicTexture = new Texture('./textures/asphalt/asphalt_ao_rough_metal.jpg', scene);
+    pbr.metallicTexture = new Texture('./assets/textures/asphalt/asphalt_ao_rough_metal.jpg', scene);
 
     return pbr;
 };
@@ -66,9 +66,9 @@ const createAsphalt = (scene: Scene) => {
 const CreateBallTexture = (scene: Scene) => {
     const pbr = new PBRMaterial('magic', scene);
 
-    pbr.albedoTexture = new Texture('textures/magic/magic_diff.jpg', scene);
+    pbr.albedoTexture = new Texture('assets/textures/magic/magic_diff.jpg', scene);
 
-    pbr.bumpTexture = new Texture('textures/magic/magic_nor.jpg', scene);
+    pbr.bumpTexture = new Texture('assets/textures/magic/magic_nor.jpg', scene);
 
     pbr.invertNormalMapX = true;
     pbr.invertNormalMapY = true;
@@ -77,10 +77,10 @@ const CreateBallTexture = (scene: Scene) => {
     pbr.useRoughnessFromMetallicTextureGreen = true;
     pbr.useMetallnessFromMetallicTextureBlue = true;
 
-    pbr.metallicTexture = new Texture('textures/magic/magic_ao_rough_metal.jpg', scene);
+    pbr.metallicTexture = new Texture('assets/textures/magic/magic_ao_rough_metal.jpg', scene);
 
     // pbr.emissiveColor = new Color3(1, 1, 1);
-    // pbr.emissiveTexture = new Texture('./textures/magic/magic_ao_rough_metal.jpg', scene);
+    // pbr.emissiveTexture = new Texture('./assets/textures/magic/magic_ao_rough_metal.jpg', scene);
     // pbr.emissiveIntensity = 3;
 
     // const glowLayer = new GlowLayer('glow', scene);

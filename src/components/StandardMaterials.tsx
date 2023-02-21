@@ -32,19 +32,19 @@ const createGroundMaterial = (scene: Scene) => {
     const uvScale = 4;
     const textureArray: Texture[] = [];
 
-    const diffTex = new Texture('./textures/stone/cobblestone_diff.jpg', scene);
+    const diffTex = new Texture('assets/assets/textures/stone/cobblestone_diff.jpg', scene);
     groundMat.diffuseTexture = diffTex;
     textureArray.push(diffTex);
 
-    const normalTex = new Texture('./textures/stone/cobblestone_nor.jpg', scene);
+    const normalTex = new Texture('assets/assets/textures/stone/cobblestone_nor.jpg', scene);
     groundMat.bumpTexture = normalTex;
     textureArray.push(normalTex);
 
-    const aoTex = new Texture('./textures/stone/cobblestone_ao.jpg', scene);
+    const aoTex = new Texture('assets/assets/textures/stone/cobblestone_ao.jpg', scene);
     groundMat.ambientTexture = aoTex;
     textureArray.push(aoTex);
 
-    const specTex = new Texture('./textures/stone/cobblestone_spec.jpg', scene);
+    const specTex = new Texture('assets/assets/textures/stone/cobblestone_spec.jpg', scene);
     groundMat.specularTexture = specTex;
     textureArray.push(specTex);
 
@@ -62,22 +62,22 @@ const createBallMaterial = (scene: Scene) => {
     const uvScale = 1;
     const textureArray: Texture[] = [];
 
-    const diffTex = new Texture('./textures/metal/metal_diff.jpg', scene);
+    const diffTex = new Texture('assets/assets/textures/metal/metal_diff.jpg', scene);
     ballMat.diffuseTexture = diffTex;
     textureArray.push(diffTex);
 
-    const normalTex = new Texture('./textures/metal/metal_nor.jpg', scene);
+    const normalTex = new Texture('assets/assets/textures/metal/metal_nor.jpg', scene);
     ballMat.bumpTexture = normalTex;
     ballMat.invertNormalMapX = true;
     ballMat.invertNormalMapY = true;
 
     textureArray.push(normalTex);
 
-    const aoTex = new Texture('./textures/metal/metal_ao.jpg', scene);
+    const aoTex = new Texture('assets/assets/textures/metal/metal_ao.jpg', scene);
     ballMat.ambientTexture = aoTex;
     textureArray.push(aoTex);
 
-    const specTex = new Texture('./textures/metal/metal_spec.jpg', scene);
+    const specTex = new Texture('assets/assets/textures/metal/metal_spec.jpg', scene);
     ballMat.specularTexture = specTex;
     ballMat.specularPower = 1;
     textureArray.push(specTex);
