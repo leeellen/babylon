@@ -1,5 +1,6 @@
 import { FreeCamera, Vector3, HemisphericLight, MeshBuilder, Scene, SceneLoader } from '@babylonjs/core';
 import SceneComponent from './SceneComponent';
+import '@babylonjs/loaders';
 
 const prototype_Level = require('../assets/models/prototype_Level.glb');
 
