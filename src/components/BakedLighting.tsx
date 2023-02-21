@@ -1,27 +1,6 @@
-import {
-    FreeCamera,
-    Vector3,
-    Scene,
-    SceneLoader,
-    MeshBuilder,
-    GlowLayer,
-    Light,
-    LightGizmo,
-    GizmoManager,
-    HemisphericLight,
-    Color3,
-    DirectionalLight,
-    PointLight,
-    AbstractMesh,
-    SpotLight,
-    ShadowGenerator,
-} from '@babylonjs/core';
+import { FreeCamera, Vector3, Scene, SceneLoader, AbstractMesh } from '@babylonjs/core';
 import '@babylonjs/loaders';
 import SceneComponent from './SceneComponent';
-
-let models: AbstractMesh[] = [];
-let lightTubes: AbstractMesh[] = [];
-let ball: AbstractMesh;
 
 const onSceneReady = (scene: Scene) => {
     createCamera(scene);
@@ -36,7 +15,7 @@ const createCamera = (scene: Scene) => {
 };
 
 const createEnvironment = async (scene: Scene) => {
-    const { meshes } = await SceneLoader.ImportMeshAsync('', 'models/', 'bust_demo.glb', scene);
+    const { meshes } = await SceneLoader.ImportMeshAsync('', 'assets/models/', 'bust_demo.glb', scene);
 };
 
 const onRender = (scene: Scene) => {
