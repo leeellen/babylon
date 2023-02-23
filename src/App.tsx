@@ -1,8 +1,8 @@
 import './styles/index.css';
-import PhysicsVelocity from './components/PhysicsVelocity';
+import Raycasting from './components/Raycasting';
 
 function App() {
-    return <PhysicsVelocity />;
+    return <Raycasting />;
 }
 
 export default App;

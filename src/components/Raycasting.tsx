@@ -59,8 +59,8 @@ const createPhysics = () => {
     currentScene.enablePhysics(new Vector3(0, -9.81, 0), new CannonJSPlugin(true, 10, CANNON));
 
     createImpostor();
-    createImpulse();
-    createCannonball();
+    // createImpulse();
+    // createCannonball();
 };
 
 const createImpostor = () => {
@@ -68,10 +68,19 @@ const createImpostor = () => {
         width: 40,
         height: 40,
     });
-
     ground.isVisible = false;
-
     ground.physicsImpostor = new PhysicsImpostor(ground, PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 1 });
+
+    const sphere = MeshBuilder.CreateSphere('sphere', { diameter: 3 });
+    const sphereMat = new PBRMaterial('sphereMat', currentScene);
+    sphereMat.roughness = 1;
+
+    sphere.position.y = 3;
+
+    sphereMat.albedoColor = new Color3(1, 0.5, 0);
+    sphere.material = sphereMat;
+
+    sphere.physicsImpostor = new PhysicsImpostor(sphere, PhysicsImpostor.SphereImpostor, { mass: 20, friction: 1 });
 };
 
 const createImpulse = () => {
@@ -147,6 +156,6 @@ const onRender = (scene: Scene) => {
      */
 };
 
-export default function PhysicsVelocity() {
+export default function Raycasting() {
     return <SceneComponent antialias onSceneReady={onSceneReady} onRender={onRender} />;
 }
