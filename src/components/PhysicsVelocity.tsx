@@ -8,6 +8,11 @@ import {
     CannonJSPlugin,
     MeshBuilder,
     PhysicsImpostor,
+    Mesh,
+    PBRMaterial,
+    Color3,
+    ActionManager,
+    ExecuteCodeAction,
 } from '@babylonjs/core';
 import '@babylonjs/loaders';
 import * as CANNON from 'cannon';
@@ -19,11 +24,23 @@ const rocket = require('../assets/models/toon_rocket.glb');
 
 let currentScene: Scene;
 let camera: FreeCamera;
+let ground: Mesh;
+let cannonball: Mesh;
 
 const onSceneReady = (scene: Scene) => {
     currentScene = scene;
 
-    const envTex = CubeTexture.CreateFromPrefilteredData(sky, scene);
+    createScene();
+    createEnvironment();
+    createPhysics();
+
+    currentScene.onPointerDown = (e) => {
+        if (e.button === 2) shootCannonball();
+    };
+};
+
+const createScene = () => {
+    const envTex = CubeTexture.CreateFromPrefilteredData(sky, currentScene);
     envTex.gammaSpace = false;
     envTex.rotationY = Math.PI / 2;
     currentScene.environmentTexture = envTex;
@@ -32,24 +49,22 @@ const onSceneReady = (scene: Scene) => {
     camera = new FreeCamera('camera', new Vector3(0, 2, -5), currentScene);
     camera.attachControl();
     camera.minZ = -0.5;
-
-    currentScene.enablePhysics(new Vector3(0, -9.81, 0), new CannonJSPlugin(true, 10, CANNON));
-
-    createEnvironment();
-    createImpostor();
-    createRocket();
 };
 
 const createEnvironment = async () => {
-    const hemiLight = new HemisphericLight('hemiLight', new Vector3(0, 1, 0), currentScene);
-
-    hemiLight.intensity = 0.5;
-
     await SceneLoader.ImportMeshAsync('', proto, '', currentScene);
 };
 
+const createPhysics = () => {
+    currentScene.enablePhysics(new Vector3(0, -9.81, 0), new CannonJSPlugin(true, 10, CANNON));
+
+    createImpostor();
+    createImpulse();
+    createCannonball();
+};
+
 const createImpostor = () => {
-    const ground = MeshBuilder.CreateGround('ground', {
+    ground = MeshBuilder.CreateGround('ground', {
         width: 40,
         height: 40,
     });
@@ -59,37 +74,71 @@ const createImpostor = () => {
     ground.physicsImpostor = new PhysicsImpostor(ground, PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 1 });
 };
 
-const createRocket = async () => {
-    const { meshes } = await SceneLoader.ImportMeshAsync('', rocket, '', currentScene);
+const createImpulse = () => {
+    const box = MeshBuilder.CreateBox('box', { height: 4 }); // create box mesh
+    const boxMat = new PBRMaterial('boxMat', currentScene); // box pbr material
 
-    const rocketCol = MeshBuilder.CreateBox('rocketCol', { width: 1, height: 1.7, depth: 1 });
-    rocketCol.position.y = 0.85;
-    rocketCol.visibility = 0;
+    boxMat.roughness = 1;
+    box.position.y = 3;
+    boxMat.albedoColor = new Color3(1, 0.5, 0);
+    box.material = boxMat;
 
-    rocketCol.physicsImpostor = new PhysicsImpostor(rocketCol, PhysicsImpostor.BoxImpostor, {
+    // physics set up
+    box.physicsImpostor = new PhysicsImpostor(box, PhysicsImpostor.BoxImpostor, { mass: 0.5, friction: 1 });
+
+    box.actionManager = new ActionManager(currentScene);
+
+    /**
+     * registerAction : 액션 등록
+     * ExecuteCodeAction : 트리거된 코드(외부 이벤트)를 실행하는 작업을 정의합니다.
+     *  */
+    box.actionManager.registerAction(
+        new ExecuteCodeAction(ActionManager.OnPickDownTrigger, () => {
+            if (!box.physicsImpostor) return;
+
+            // 박스에 커서 다운(OnPickDown) 시 가해질 힘 설정
+            box.physicsImpostor.applyImpulse(
+                new Vector3(-3, 0, 1),
+                box.getAbsolutePosition().add(new Vector3(0, 2, 0)),
+            );
+        }),
+    );
+};
+
+const createCannonball = () => {
+    cannonball = MeshBuilder.CreateSphere('cannonball', { diameter: 0.5 });
+    const ballMat = new PBRMaterial('ballMat', currentScene);
+    ballMat.roughness = 1;
+    ballMat.albedoColor = new Color3(0, 1, 0);
+
+    cannonball.material = ballMat;
+
+    // 물리법칙 적용
+    cannonball.physicsImpostor = new PhysicsImpostor(cannonball, PhysicsImpostor.SphereImpostor, {
         mass: 1,
+        friction: 1,
     });
 
-    meshes[0].setParent(rocketCol);
+    cannonball.position = camera.position; // 카메라 위치로 지정
+    cannonball.setEnabled(false); // 보이지 않게
+};
 
-    rocketCol.rotate(Vector3.Forward(), 0.5);
+const shootCannonball = () => {
+    const clone = cannonball.clone('clone'); // 공 복사
 
-    const rocketPhysics = () => {
-        if (rocketCol.physicsImpostor) {
-            camera.position = new Vector3(rocketCol.position.x, rocketCol.position.y, camera.position.z); // 카메라가 로켓 따라가도록
+    if (clone.physicsImpostor && ground.physicsImpostor) {
+        clone.position = camera.position; // 카메라와 동일한 위치로 지정하고
 
-            rocketCol.physicsImpostor.setLinearVelocity(rocketCol.up.scale(5)); // 움직임
-            rocketCol.physicsImpostor.setAngularVelocity(rocketCol.up); // 회전
-        }
-    };
+        clone.setEnabled(true); // 보이도록
 
-    let gameOver = false;
-    if (!gameOver) currentScene.registerBeforeRender(rocketPhysics); // 모든 프레임마다 실행
+        clone.physicsImpostor.applyForce(camera.getForwardRay().direction.scale(1000), clone.getAbsolutePosition());
 
-    currentScene.onPointerDown = () => {
-        gameOver = true;
-        currentScene.unregisterBeforeRender(rocketPhysics); // 모든 프레임마다 실행
-    };
+        clone.physicsImpostor.registerOnPhysicsCollide(ground.physicsImpostor, () => {
+            setTimeout(() => {
+                clone.dispose();
+            }, 3000);
+        });
+    }
 };
 
 const onRender = (scene: Scene) => {
