@@ -1,8 +1,8 @@
 import './styles/index.css';
-import PhysicsImposter from './components/PhysicsImposters';
+import CollisionsAndTriggers from './components/CollisionsAndTriggers';
 
 function App() {
-    return <PhysicsImposter />;
+    return <CollisionsAndTriggers />;
 }
 
 export default App;
