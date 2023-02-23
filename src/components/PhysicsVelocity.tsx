@@ -22,6 +22,6 @@ const onRender = (scene: Scene) => {
      */
 };
 
-export default function Basic() {
+export default function PhysicsVelocity() {
     return <SceneComponent antialias onSceneReady={onSceneReady} onRender={onRender} />;
 }
