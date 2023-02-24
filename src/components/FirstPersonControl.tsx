@@ -1,7 +1,17 @@
-import { FreeCamera, Vector3, HemisphericLight, MeshBuilder, Scene, SceneLoader, Engine } from '@babylonjs/core';
+import {
+    FreeCamera,
+    Vector3,
+    HemisphericLight,
+    MeshBuilder,
+    Scene,
+    SceneLoader,
+    Engine,
+    CubeTexture,
+} from '@babylonjs/core';
 import SceneComponent from './SceneComponent';
 import '@babylonjs/loaders';
 
+const sky = require('../assets/environment/sky.env');
 const prototype_Level = require('../assets/models/prototype_Level.glb');
 
 let currentScene: Scene;
@@ -11,12 +21,20 @@ const onSceneReady = (scene: Scene, engine: Engine) => {
     currentScene = scene;
     currentEngine = engine;
 
+    currentScene.registerBeforeRender(() => currentEngine.enterPointerlock());
+
+    const envTex = CubeTexture.CreateFromPrefilteredData(sky, scene);
+    envTex.gammaSpace = false;
+    envTex.rotationY = Math.PI / 2;
+    currentScene.environmentTexture = envTex;
+    currentScene.createDefaultSkybox(envTex, true, 1000, 0.25);
+
     new HemisphericLight('hemi', new Vector3(0, 1, 0), currentScene);
 
-    currentScene.onPointerDown = (e) => {
-        if (e.button === 0) currentEngine.enterPointerlock();
-        if (e.button === 1) currentEngine.exitPointerlock();
-    };
+    // currentScene.onPointerDown = (e) => {
+    //     if (e.button === 0) currentEngine.enterPointerlock();
+    //     if (e.button === 1) currentEngine.exitPointerlock();
+    // };
 
     const framesPerSecond = 60;
     const gravity = -9.81;
@@ -44,8 +62,8 @@ const createController = () => {
     camera.ellipsoid = new Vector3(1, 1, 1);
 
     camera.minZ = 0.45;
-    camera.speed = 0.75;
-    camera.angularSensibility = 4000;
+    camera.speed = 0.25;
+    camera.angularSensibility = 7000;
 
     camera.keysUp.push(87);
     camera.keysDown.push(83);
