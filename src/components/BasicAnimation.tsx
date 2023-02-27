@@ -12,6 +12,8 @@ import {
     Color3,
     Texture,
     Matrix,
+    AbstractMesh,
+    Animation,
 } from '@babylonjs/core';
 import '@babylonjs/loaders';
 import * as CANNON from 'cannon';
@@ -19,116 +21,120 @@ import SceneComponent from './SceneComponent';
 
 const sky = require('../assets/environment/sky.env');
 const proto = require('../assets/models/Prototype_Level.glb');
-const blueTexture = require('../assets/textures/blue.png');
-const greenTexture = require('../assets/textures/green.png');
-const orangeTexture = require('../assets/textures/orange.png');
+const targetModel = require('../assets/models/target.glb');
 
 let currentScene: Scene;
 let camera: FreeCamera;
-let ground: Mesh;
-let splatters: PBRMaterial[];
+let target: AbstractMesh;
 
 const onSceneReady = (scene: Scene) => {
     currentScene = scene;
 
     createScene();
     createEnvironment();
-    createTextures();
-    createPickingRay();
-    createPhysics();
+    createTarget();
 };
 
 const createScene = () => {
     const envTex = CubeTexture.CreateFromPrefilteredData(sky, currentScene);
+
     envTex.gammaSpace = false;
+
     envTex.rotationY = Math.PI / 2;
+
     currentScene.environmentTexture = envTex;
+
     currentScene.createDefaultSkybox(envTex, true, 1000, 0.25);
 
-    camera = new FreeCamera('camera', new Vector3(0, 2, -5), currentScene);
+    const camera = new FreeCamera('camera', new Vector3(0, 2, -10), currentScene);
     camera.attachControl();
-    camera.minZ = -0.5;
+    camera.minZ = 0.5;
+    camera.speed = 0.5;
 };
 
 const createEnvironment = async () => {
     await SceneLoader.ImportMeshAsync('', proto, '', currentScene);
 };
 
-const createPhysics = () => {
-    currentScene.enablePhysics(new Vector3(0, -9.81, 0), new CannonJSPlugin(true, 10, CANNON));
+const createTarget = async () => {
+    const { meshes } = await SceneLoader.ImportMeshAsync('', targetModel, '', currentScene);
 
-    createImpostor();
+    meshes.shift();
+    target = Mesh.MergeMeshes(meshes as Mesh[], true, true, undefined, false, true)!;
+
+    target.position.y = 3;
+    createAnimations();
 };
 
-const createImpostor = () => {
-    ground = MeshBuilder.CreateGround('ground', {
-        width: 40,
-        height: 40,
-    });
-    ground.isVisible = false;
-    ground.physicsImpostor = new PhysicsImpostor(ground, PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 1 });
+const createAnimations = () => {
+    const rotateFrames = [];
+    const sliderFrames = [];
+    const fadeFrames = [];
+    const fps = 60;
 
-    const sphere = MeshBuilder.CreateSphere('sphere', { diameter: 3 });
-    const sphereMat = new PBRMaterial('sphereMat', currentScene);
-    sphereMat.roughness = 1;
+    const rotateAnim = new Animation(
+        'rotateAnim',
+        'rotation.z',
+        fps,
+        Animation.ANIMATIONTYPE_FLOAT,
+        Animation.ANIMATIONLOOPMODE_CYCLE,
+    );
 
-    sphere.position.y = 3;
+    const slideAnim = new Animation(
+        'slideAnim',
+        'position',
+        fps,
+        Animation.ANIMATIONTYPE_VECTOR3,
+        Animation.ANIMATIONLOOPMODE_CYCLE,
+    );
 
-    sphereMat.albedoColor = new Color3(1, 0.5, 0);
-    sphere.material = sphereMat;
+    const fadeAnim = new Animation(
+        'fadeAnim',
+        'visibility',
+        fps,
+        Animation.ANIMATIONTYPE_FLOAT,
+        Animation.ANIMATIONLOOPMODE_CONSTANT,
+    );
 
-    sphere.physicsImpostor = new PhysicsImpostor(sphere, PhysicsImpostor.SphereImpostor, { mass: 20, friction: 1 });
-};
+    rotateFrames.push({ frame: 0, value: 0 });
+    rotateFrames.push({ frame: 180, value: Math.PI / 2 });
 
-const createTextures = () => {
-    const blue = new PBRMaterial('blue', currentScene);
-    const orange = new PBRMaterial('orange', currentScene);
-    const green = new PBRMaterial('green', currentScene);
+    sliderFrames.push({ frame: 0, value: new Vector3(0, 3, 0) });
+    sliderFrames.push({ frame: 45, value: new Vector3(-3, 2, 0) });
+    sliderFrames.push({ frame: 90, value: new Vector3(0, 3, 0) });
+    sliderFrames.push({ frame: 135, value: new Vector3(3, 2, 0) });
+    sliderFrames.push({ frame: 180, value: new Vector3(0, 3, 0) });
 
-    blue.roughness = 1;
-    orange.roughness = 1;
-    green.roughness = 1;
+    fadeFrames.push({ frame: 0, value: 1 });
+    fadeFrames.push({ frame: 180, value: 0 });
 
-    blue.albedoTexture = new Texture(blueTexture, currentScene);
-    green.albedoTexture = new Texture(greenTexture, currentScene);
-    orange.albedoTexture = new Texture(orangeTexture, currentScene);
+    rotateAnim.setKeys(rotateFrames);
+    slideAnim.setKeys(sliderFrames);
+    fadeAnim.setKeys(fadeFrames);
 
-    blue.albedoTexture.hasAlpha = true;
-    orange.albedoTexture.hasAlpha = true;
-    green.albedoTexture.hasAlpha = true;
+    target.animations.push(rotateAnim);
+    target.animations.push(slideAnim);
+    target.animations.push(fadeAnim);
 
-    blue.zOffset = -0.25;
-    orange.zOffset = -0.25;
-    green.zOffset = -0.25;
+    const onAnimationEnd = () => {
+        console.log('animation ended');
+        target.setEnabled(false);
+    };
 
-    splatters = [blue, orange, green];
-};
+    const animControl = currentScene.beginDirectAnimation(
+        target,
+        [slideAnim, rotateAnim],
+        0,
+        180,
+        true,
+        1,
+        onAnimationEnd,
+    );
 
-const createPickingRay = () => {
-    // 포인터가 눌리면
-    currentScene.onPointerDown = () => {
-        const ray = currentScene.createPickingRay(
-            currentScene.pointerX, // 현재 scene에서 pointer x 좌표
-            currentScene.pointerY, // 현재 scene에서 pointer y 좌표
-            Matrix.Identity(),
-            camera,
-        );
-
-        const raycastHit = currentScene.pickWithRay(ray); // raycast로 선택된 데이터, pickWithRay로 가져올 수 있다.
-
-        // 구체를 선택한 경우에만 실행
-        if (raycastHit && raycastHit.hit && raycastHit?.pickedMesh?.name === 'sphere') {
-            const decal = MeshBuilder.CreateDecal('decal', raycastHit.pickedMesh, {
-                position: raycastHit.pickedPoint!,
-                normal: raycastHit.getNormal(true)!,
-                size: new Vector3(1, 1, 1),
-            });
-
-            decal.material = splatters[Math.floor(Math.random() * splatters.length)];
-
-            decal.setParent(raycastHit.pickedMesh); // 부모로 설정하여 구체와 메터리얼을 묶어준다.
-
-            raycastHit.pickedMesh.physicsImpostor!.applyImpulse(ray.direction.scale(5), raycastHit.pickedPoint!);
+    currentScene.onPointerDown = async (evt) => {
+        if (evt.button === 0) {
+            await currentScene.beginDirectAnimation(target, [fadeAnim], 0, 180).waitAsync();
+            animControl.stop();
         }
     };
 };
