@@ -1,8 +1,8 @@
 import './styles/index.css';
-import BasicAnimation from './components/BasicAnimation';
+import CharacterAnimation from './components/CharacterAnimation';
 
 function App() {
-    return <BasicAnimation />;
+    return <CharacterAnimation />;
 }
 
 export default App;
