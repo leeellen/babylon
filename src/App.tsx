@@ -1,8 +1,8 @@
 import './styles/index.css';
-import Raycasting from './components/Raycasting';
+import BasicAnimation from './components/BasicAnimation';
 
 function App() {
-    return <Raycasting />;
+    return <BasicAnimation />;
 }
 
 export default App;
