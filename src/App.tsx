@@ -1,8 +1,8 @@
 import './styles/index.css';
-import CharacterAnimation from './components/CharacterAnimation';
+import AnimationCutscene from './components/AnimationCutscene';
 
 function App() {
-    return <CharacterAnimation />;
+    return <AnimationCutscene />;
 }
 
 export default App;
