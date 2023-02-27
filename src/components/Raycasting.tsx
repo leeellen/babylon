@@ -1,7 +1,6 @@
 import {
     FreeCamera,
     Vector3,
-    HemisphericLight,
     Scene,
     SceneLoader,
     CubeTexture,
@@ -11,8 +10,8 @@ import {
     Mesh,
     PBRMaterial,
     Color3,
-    ActionManager,
-    ExecuteCodeAction,
+    Texture,
+    Matrix,
 } from '@babylonjs/core';
 import '@babylonjs/loaders';
 import * as CANNON from 'cannon';
@@ -20,23 +19,23 @@ import SceneComponent from './SceneComponent';
 
 const sky = require('../assets/environment/sky.env');
 const proto = require('../assets/models/Prototype_Level.glb');
-const rocket = require('../assets/models/toon_rocket.glb');
+const blueTexture = require('../assets/textures/blue.png');
+const greenTexture = require('../assets/textures/green.png');
+const orangeTexture = require('../assets/textures/orange.png');
 
 let currentScene: Scene;
 let camera: FreeCamera;
 let ground: Mesh;
-let cannonball: Mesh;
+let splatters: PBRMaterial[];
 
 const onSceneReady = (scene: Scene) => {
     currentScene = scene;
 
     createScene();
     createEnvironment();
+    createTextures();
+    createPickingRay();
     createPhysics();
-
-    currentScene.onPointerDown = (e) => {
-        if (e.button === 2) shootCannonball();
-    };
 };
 
 const createScene = () => {
@@ -59,8 +58,6 @@ const createPhysics = () => {
     currentScene.enablePhysics(new Vector3(0, -9.81, 0), new CannonJSPlugin(true, 10, CANNON));
 
     createImpostor();
-    // createImpulse();
-    // createCannonball();
 };
 
 const createImpostor = () => {
@@ -83,71 +80,57 @@ const createImpostor = () => {
     sphere.physicsImpostor = new PhysicsImpostor(sphere, PhysicsImpostor.SphereImpostor, { mass: 20, friction: 1 });
 };
 
-const createImpulse = () => {
-    const box = MeshBuilder.CreateBox('box', { height: 4 }); // create box mesh
-    const boxMat = new PBRMaterial('boxMat', currentScene); // box pbr material
+const createTextures = () => {
+    const blue = new PBRMaterial('blue', currentScene);
+    const orange = new PBRMaterial('orange', currentScene);
+    const green = new PBRMaterial('green', currentScene);
 
-    boxMat.roughness = 1;
-    box.position.y = 3;
-    boxMat.albedoColor = new Color3(1, 0.5, 0);
-    box.material = boxMat;
+    blue.roughness = 1;
+    orange.roughness = 1;
+    green.roughness = 1;
 
-    // physics set up
-    box.physicsImpostor = new PhysicsImpostor(box, PhysicsImpostor.BoxImpostor, { mass: 0.5, friction: 1 });
+    blue.albedoTexture = new Texture(blueTexture, currentScene);
+    green.albedoTexture = new Texture(greenTexture, currentScene);
+    orange.albedoTexture = new Texture(orangeTexture, currentScene);
 
-    box.actionManager = new ActionManager(currentScene);
+    blue.albedoTexture.hasAlpha = true;
+    orange.albedoTexture.hasAlpha = true;
+    green.albedoTexture.hasAlpha = true;
 
-    /**
-     * registerAction : 액션 등록
-     * ExecuteCodeAction : 트리거된 코드(외부 이벤트)를 실행하는 작업을 정의합니다.
-     *  */
-    box.actionManager.registerAction(
-        new ExecuteCodeAction(ActionManager.OnPickDownTrigger, () => {
-            if (!box.physicsImpostor) return;
+    blue.zOffset = -0.25;
+    orange.zOffset = -0.25;
+    green.zOffset = -0.25;
 
-            // 박스에 커서 다운(OnPickDown) 시 가해질 힘 설정
-            box.physicsImpostor.applyImpulse(
-                new Vector3(-3, 0, 1),
-                box.getAbsolutePosition().add(new Vector3(0, 2, 0)),
-            );
-        }),
-    );
+    splatters = [blue, orange, green];
 };
 
-const createCannonball = () => {
-    cannonball = MeshBuilder.CreateSphere('cannonball', { diameter: 0.5 });
-    const ballMat = new PBRMaterial('ballMat', currentScene);
-    ballMat.roughness = 1;
-    ballMat.albedoColor = new Color3(0, 1, 0);
+const createPickingRay = () => {
+    // 포인터가 눌리면
+    currentScene.onPointerDown = () => {
+        const ray = currentScene.createPickingRay(
+            currentScene.pointerX, // 현재 scene에서 pointer x 좌표
+            currentScene.pointerY, // 현재 scene에서 pointer y 좌표
+            Matrix.Identity(),
+            camera,
+        );
 
-    cannonball.material = ballMat;
+        const raycastHit = currentScene.pickWithRay(ray); // raycast로 선택된 데이터, pickWithRay로 가져올 수 있다.
 
-    // 물리법칙 적용
-    cannonball.physicsImpostor = new PhysicsImpostor(cannonball, PhysicsImpostor.SphereImpostor, {
-        mass: 1,
-        friction: 1,
-    });
+        // 구체를 선택한 경우에만 실행
+        if (raycastHit && raycastHit.hit && raycastHit?.pickedMesh?.name === 'sphere') {
+            const decal = MeshBuilder.CreateDecal('decal', raycastHit.pickedMesh, {
+                position: raycastHit.pickedPoint!,
+                normal: raycastHit.getNormal(true)!,
+                size: new Vector3(1, 1, 1),
+            });
 
-    cannonball.position = camera.position; // 카메라 위치로 지정
-    cannonball.setEnabled(false); // 보이지 않게
-};
+            decal.material = splatters[Math.floor(Math.random() * splatters.length)];
 
-const shootCannonball = () => {
-    const clone = cannonball.clone('clone'); // 공 복사
+            decal.setParent(raycastHit.pickedMesh); // 부모로 설정하여 구체와 메터리얼을 묶어준다.
 
-    if (clone.physicsImpostor && ground.physicsImpostor) {
-        clone.position = camera.position; // 카메라와 동일한 위치로 지정하고
-
-        clone.setEnabled(true); // 보이도록
-
-        clone.physicsImpostor.applyForce(camera.getForwardRay().direction.scale(1000), clone.getAbsolutePosition());
-
-        clone.physicsImpostor.registerOnPhysicsCollide(ground.physicsImpostor, () => {
-            setTimeout(() => {
-                clone.dispose();
-            }, 3000);
-        });
-    }
+            raycastHit.pickedMesh.physicsImpostor!.applyImpulse(ray.direction.scale(5), raycastHit.pickedPoint!);
+        }
+    };
 };
 
 const onRender = (scene: Scene) => {
